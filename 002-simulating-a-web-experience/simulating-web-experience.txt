@@ -1,0 +1,25 @@
+# How to Simulate a Web Experience in Development
+
+Certain things are just too fast in development mode.  The bandwidth is essentially infinite and that is way to high to simulate the experience your users will have in production.
+
+## Slowing things down
+
+I was looking for a way to test a file upload progress bar and found this great tip to [throttle bandwidth on Mac OSX](http://www.macosxhints.com/article.php?story=20080119112509736).  Run the following commands if you serve your development application using Passenger:
+
+	sudo ipfw pipe 1 config bw 15KByte/s
+	sudo ipfw add 1 pipe 1 src-port 80
+	sudo ipfw add 1 pipe 1 dst-port 80
+
+This will make all of the traffic to and from your local Apache server slow.  Of course the port 80 can be changed to 3000 if you are using a Mongrel setup in development.
+
+To go back to normal use:
+
+	sudo ipfw delete 1
+
+## Make the wheel squeaky
+
+If you are interacting with your site behind a slow connection it provides an easy way to see which parts of your application are too slow.  These problems are sometimes more easily fixed early, such as when the design assets of the site are created.  **Note:** this will slow down all of your web traffic.  So if you are [loading things like Prototype or jQuery from Google](http://code.google.com/apis/ajaxlibs/) then this will also be slowed.  Talk about a real simulation.  
+
+## Testing a file upload progress bar
+
+This technique works great when developing a progress bar as otherwise the upload tends to be complete before the progress bar gets a chance to do its thing.
