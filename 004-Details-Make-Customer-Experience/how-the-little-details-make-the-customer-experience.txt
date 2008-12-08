@@ -2,4 +2,25 @@
 
 ![Rebates](/posts/rebates.jpg) Apple seems to really understand the retail experience.  When I bought a computer at the Apple Store to replace my wife's notebook included was a free printer.  Of course as is often the case you first pay for the printer and then send in for a rebate.  Usually this would set of some alarm bells.  In this case I filled out the rebate form, online, with the help of the sales representative.  I have the check in my hand about one week later.  Why can't anyone else figure this out?
 
+## The usual experience
+
+1. Leave the store with several things to do i.e. homework.
+1. Cut out UPC.
+1. Photocopy receipt.
+1. Send everything in the mail to third party.
+1. Wait and hope the check arrives.
+
+## The Apple experience
+
+1. Fill out a web form with the help of the employee.
+1. Leave with nothing else to do.
+1. Receive an email saying that the rebate is being process and will be sent soon.
+1. Check in hand one week after purchase.
+
+## Setup to fail
+
+Most retailers are set up to fail with rebates.  They can offer the customer a web form but they can't allow the customer to fill out the form before leaving.  Can you imagine filling out a form while people wait behind you in the checkout line?  Furthermore the usually have the rebate experience totally out of their control in the hands of some third party.
+
+By changing the retail experience Apple has given itself room to polish many of the seemingly small details.  Each of these adds up to a great experience overall. 
+
 
