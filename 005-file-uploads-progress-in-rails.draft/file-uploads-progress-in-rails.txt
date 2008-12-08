@@ -1,0 +1,4 @@
+# How to Create a File Upload Progress Bar in Rails, Prototype and Low Pro
+
+<object width="530" height="400"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=2374819&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=00ADEF&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=2374819&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=00ADEF&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="530" height="400"></embed></object><br /><a href="http://vimeo.com/2374819">IsItCodeMashYet - Web app in under 10 minutes using the Sinatra web framework</a> from <a href="http://vimeo.com/user984252">faithfulgeek</a> on <a href="http://vimeo.com">Vimeo</a>.
+
