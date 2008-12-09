@@ -23,3 +23,5 @@ If you are interacting with your site behind a slow connection it provides an ea
 ## Testing a file upload progress bar
 
 This technique works great when developing a progress bar as otherwise the upload tends to be complete before the progress bar gets a chance to do its thing.
+
+**Update:** 37 signals has a blog post with a similar message: [Why you should mix records on crap speakers](http://www.37signals.com/svn/posts/1449-why-you-should-mix-records-on-crap-speakers)
