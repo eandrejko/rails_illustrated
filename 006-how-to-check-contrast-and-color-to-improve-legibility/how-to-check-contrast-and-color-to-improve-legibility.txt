@@ -1,0 +1,29 @@
+# How to check contrast and color to improve legibility
+
+The number one rule about text, online and in print, is that if the text is noticed then the design has failed.  Except in some specific cases, text is meant to convey information and its design should maximize legibility.
+
+## Check for proper contrast
+
+Text can fail to be legible if the contrast between too colors is too low.  Quick what does the text in blue say?
+
+![42c454ad79fa7de8e73b763650568910](/posts/42c454ad79fa7de8e73b763650568910.jpg)
+
+This text is colored #0000FF on a background of #33333 and has the following measurements:
+
+* brightness difference is 22 (W3C recommendation >= 125)
+* color difference is 306 (W3C recommendation >= 500)
+
+This color combination fails on both fronts.  These values where found using a color and contrast calculator:
+
+![Contrast Tool](/posts/contrast-tool.jpg)
+
+
+## Tools
+
+Use these tools as a guide towards improving legibility of your online text.  If you color combination fails, make sure it at least doesn't fail too badly.
+
+* [Color and contrast calculator](http://snook.ca/technical/colour_contrast/colour.html)
+* [Research about the readability of text online](http://www.aprompt.ca/WebPageColors.html)
+* [Downloadable color and contrast tool (Mac OSX, Windows)](http://www.paciellogroup.com/resources/contrast-analyser.html)
+* [Downloadable color blindness simulator (Mac OSX)](http://michelf.com/projects/sim-daltonism/)
+
