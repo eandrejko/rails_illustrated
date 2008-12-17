@@ -65,3 +65,7 @@ If you are using Apache you can configure your virtual host directive to use [mo
 ## Etags
 
 Rails 2.2 supports Etags. Look for another post about Etags in the future.
+
+## More reading (update)
+
+For a lot more detailed discussion about improving your sites performance see: [Stanford Course CS193H: High Performance Web Sites](http://cs193h.stevesouders.com/).
