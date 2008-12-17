@@ -1,0 +1,67 @@
+# Improving your Rails Application Speed
+
+Your users are happiest when they don't notice how fast your application responds.  If your users notice your web application speed it is probably because they notice it is too slow.  Most speed improvements happen outside the Rails stack.
+
+## Typical page loading time
+
+Here is the output of the  **Safari Web Inspector - Network** report.  The page took 3 seconds to load.
+
+![Safari Web Inspector](posts/safari-web-inspector.jpg)
+
+Notice that the Rails application took only 300ms, including the time needed to download the generated HTML.  About 90% of the time was taken loading the various assets: javascript, css and images.  
+
+## Tools of the Trade
+### YSlow
+The primary tool for analyzing the speed of any web application is [Yslow](http://developer.yahoo.com/yslow/) from Yahoo.  YSlow grades your application and produces a report:
+
+![Yslow Report](posts/yslow-report.jpg)
+
+### Safari Develop Menu
+Install the Safari Develop Menu with the following command:
+
+	$ defaults write com.apple.Safari IncludeDebugMenu 1
+
+The **Safari Web Inspector - Network** report will produce a report like above showing the amount of time spent loading various components of the page.
+
+## Make fewer HTTP requests/Minify JS
+
+You should send only 1 javascript file and 1 css file.  No more.  The [asset packager plugin](http://synthesis.sbecker.net/pages/asset_packager) is a plugin that will automatically package all of your css files and javascript files into one.
+Install with:
+	$ script/plugin install git://github.com/sbecker/asset_packager.git
+
+Then produce the `asset_packages.yml` with:
+	$ rake asset:packager:create_yml
+
+You will need to edit the `config/asset_packages.yml` file to ensure that the scripts are loaded in the correct order.  
+
+In your **`application.html.erb`** layout file place the following:
+
+	<script src="http://ajax.googleapis.com/ajax/libs/prototype/1.6.0.3/prototype.js" type="text/javascript" charset="utf-8"></script>
+	<%= javascript_include_merged :base %>
+	<%= stylesheet_link_merged :base %>
+
+The `prototype.js` file will be loaded from Google.  With any luck the user will already have it cached.
+
+## Load files in parallel
+
+Most browsers will make at most two simultaneous requests to each host.  Configure your **`production.rb`** to use an assets host:
+
+	# Enable serving of images, stylesheets, and javascripts from an asset server
+	config.action_controller.asset_host = "http://assets.yourhost.com"
+
+Of course, you will have to configure `assets.yourhost.com` to point to your web server.
+
+## Add an expires header/Gzip components
+
+If you are using Apache you can configure your virtual host directive to use [mod_deflate](http://httpd.apache.org/docs/2.0/mod/mod_deflate.html) and also [mod_expires](http://httpd.apache.org/docs/1.3/mod/mod_expires.html):
+
+	<VirtualHost *:80>
+		ExpiresActive On
+		ExpiresDefault "access plus 1 month"
+		AddOutputFilterByType DEFLATE text/html text/plain text/xml application/javascript text/css
+		...
+	</VirtualHost> 
+
+## Etags
+
+Rails 2.2 supports Etags. Look for another post about Etags in the future.
