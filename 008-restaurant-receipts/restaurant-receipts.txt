@@ -1,0 +1,3 @@
+# The Interface of Restaurant Receipts
+
+There is an interesting discussion of how to reduce customer errors when paying by credit cards at restaurants at [Aza's Thoughts](http://www.azarask.in/blog/):  [The Interface of Restaurant Receipts](http://www.azarask.in/blog/post/the-interface-of-resturant-reciepts/)
