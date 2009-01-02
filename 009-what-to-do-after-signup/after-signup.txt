@@ -1,0 +1,46 @@
+# What to do after signup
+
+![Are My Sites Up](/posts/are-my-sites-up.jpg) I recently signed up for the free service [Are my Sites Up?](http://css-tricks.com/launch-are-my-sites-up/).  Thanks to [Chris Coyier](http://css-tricks.com/) for providing this free service.  I think it is a good example of [underdoing the competition](http://gettingreal.37signals.com/ch02_Build_Less.php).  The signup process offers an interesting opportunity to think about the details of the user experience in signing up for a web service.
+
+## Signup and the User Experience
+
+A signup form is a big hurdle for a user.  Most web services require the user to jump through this hoop before they can try any part of product.  How does the user know it is worth the hassle?  I think Luke Wroblewski said it best in [Sign Up Forms Must Die](http://www.alistapart.com/articles/signupforms):
+
+>I’ll just come out and say this: sign-up forms must die. In the introduction to this book I described the process of stumbling upon or being recommended to a web service. You arrive eager to dive in and start engaging and what’s the first thing that greets you? A form.
+
+## Gradual Engagement
+
+Avoid the signup form hurdle by allowing a potential user to try your service before signing up.  This is **gradual engagement**, a method that doesn't require the user to make any large commitments up front.  A signup form is a large commitment.
+
+## No Signup Needed
+
+Are My Sites Up is a service that notifies the user when the HTTP status code of a URL is something other than 2XX.  The only required information to provide this service is the URL and the email address.  
+
+One possible gradual engagement process:
+
+1. User enters email address and URL to monitor.
+2. User receives email with confirmation link.
+3. Email contains link to create an account and set a password.
+
+## Test the Signup Process
+
+![Signup Steps 1 2](/posts/signup-steps-1-2.jpg)
+
+The signup process is usually the user's first experience with your service.  It must be perfect.  When I signed up for Are My Sites Up I was confused by step 2 of the process.  
+
+- Step 1: Submit signup form.
+- Step 2: ? -- I tried to login but my account was not working and no error was given.
+- Step 3: Realize I might have to check my email to activate my account.
+- Step 3: Click activation link in email.
+- Step 4: Login.
+
+A notification of the next action to take in step 2 would be helpful.  I'm sure that **user testing the signup process would have caught this error**.
+
+## Try Variations 
+
+What should happen after the user submits the signup form?
+
+- Option 1: The user is logged in automatically.  This allows the user to immediately use the service.  The disadvantage is that the user will not have the opportunity to login and hence possibly save their password with their browser.
+- Option 2: The user is given a notification and told the next action to take, and then eventually redirected to the login page.  This will allow the user to save their password in their browser.
+
+There are many possibilities that depend a lot on the service in question.   Each of these should be tested for usability and then can also be A/B tested against one another.
