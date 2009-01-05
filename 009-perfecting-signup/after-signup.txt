@@ -44,3 +44,7 @@ What should happen after the user submits the signup form?
 - Option 2: The user is given a notification and told the next action to take, and then eventually redirected to the login page.  This will allow the user to save their password in their browser.
 
 There are many possibilities that depend a lot on the service in question.   Each of these should be tested for usability and then can also be A/B tested against one another.
+
+## Update
+
+Apparently, step 2 was supposed to have a message indicating that the user should check their email, but this message wasn't displayed due to a bug.  It has been fixed now.
