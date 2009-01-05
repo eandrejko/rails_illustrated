@@ -1,0 +1,4 @@
+# User Experience Curves
+
+Following [Designing The User Experience Curve](http://www.slideshare.net/carsonified/designing-the-user-experience-curve-andybudd/) here is my holiday travel experience curve ([view pdf](/posts/holiday-experience-curve.pdf)): [![Holiday Experience Curve](/posts/holiday-experience-curve.jpg)](/posts/holiday-experience-curve-la.jpg)   When recalling my experience it occurred to me that each part of the whole experience is framed by both expectations and by the momentum from prior events.  Negative and positive experiences compound over time.  After entering the downward trend, enough momentum developed that nothing ordinary could turn the experience around.  The worse the experience the greater the expectations must be exceeded to turn the experience positive.  (via [Contrast | The Blog | The Client Experience](http://www.contrast.ie/blog/the-client-experience/))
+
