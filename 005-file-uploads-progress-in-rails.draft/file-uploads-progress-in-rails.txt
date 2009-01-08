@@ -1,2 +1,0 @@
-# How to Create a File Upload Progress Bar in Rails, Prototype and Low Pro
-

@@ -6,15 +6,22 @@ Certain things are just too fast in development mode.  The bandwidth is essentia
 
 I was looking for a way to test a file upload progress bar and found this great tip to [throttle bandwidth on Mac OSX](http://www.macosxhints.com/article.php?story=20080119112509736).  Run the following commands if you serve your development application using Passenger:
 
-	sudo ipfw pipe 1 config bw 15KByte/s
-	sudo ipfw add 1 pipe 1 src-port 80
-	sudo ipfw add 1 pipe 1 dst-port 80
+<pre>
+<code class='bash'>sudo ipfw pipe 1 config bw 15KByte/s
+sudo ipfw add 1 pipe 1 src-port 80
+sudo ipfw add 1 pipe 1 dst-port 80
+</code>
+</pre>
 
 This will make all of the traffic to and from your local Apache server slow.  Of course the port 80 can be changed to 3000 if you are using a Mongrel setup in development.
 
 To go back to normal use:
 
-	sudo ipfw delete 1
+<pre>
+<code class='bash'>	sudo ipfw delete 1
+</code>
+</pre>
+
 
 ## Make the wheel squeaky
 
