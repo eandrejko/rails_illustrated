@@ -1,0 +1,214 @@
+# Screencast : How to Create a File Upload Progress Bar in Rails, Passenger, Prototype and Low Pro
+
+<object width="530" height="400"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=2754792&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=00ADEF&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=2754792&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=00ADEF&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="530" height="400"></embed></object><br /><a href="http://vimeo.com/2754792">How to Create a File Upload Progress Bar in Rails, Passenger, Prototype and Low Pro</a> from <a href="http://vimeo.com/user1001525">Erik Andrejko</a> on <a href="http://vimeo.com">Vimeo</a>.
+
+An upload progress bar is one of the best ways to improve the usability of file uploads in your application.  This screencast will show how to create a file upload progress bar using Rails, Passenger, Low Pro and the [upload progress bar apache module](http://drogomir.com/blog/2008/6/18/upload-progress-bar-with-mod_passenger-and-apache).
+
+## Screen Cast
+- View a quicktime version: [full](/posts/file-upload-progress-bars.mov), [iPod](/posts/file-upload-progress-bars-iPhone.m4v).
+- [View the complete code for the screencast](http://github.com/eandrejko/rails_illustrated_screencasts/tree/master/file_upload_progress).
+
+## Required
+
+- [Passenger](http://www.modrails.com/)
+- [Upload progress bar apache module](http://drogomir.com/blog/2008/6/18/upload-progress-bar-with-mod_passenger-and-apache)
+- [Prototype](http://www.prototypejs.org/) 
+- [Low Pro](http://www.danwebb.net/2006/9/3/low-pro-unobtrusive-scripting-for-prototype) for unobtrusive javascript
+- [Paperclip](http://www.thoughtbot.com/projects/paperclip) or something else to handle the uploaded files
+
+## Optional
+
+- [Configure a realistic (slow) development environment](/simulating-a-web-experience.html)
+- [Passenger Prefpane](http://www.fngtps.com/passenger-preference-pane) a preference pane for Passenger under OS X Leopard
+
+## 1. Install Apache Module
+A module must be installed for Apache to respond to requests for the upload progress.  The instructions for installing the Apache module can be found at [Drogomir's blog](http://drogomir.com/blog/2008/6/18/upload-progress-bar-with-mod_passenger-and-apache).
+
+### Installing under Intel and Mac OS X 
+The default compile of the apache module will not work under Leopard.  Apache will generate this error on startup:
+
+<pre>
+<code class='bash'>httpd: Syntax error on line 489 of /private/etc/apache2/httpd.conf: Cannot load /usr/libexec/apache2/mod_upload_progress.so into server: dlopen(/usr/libexec/apache2/mod_upload_progress.so, 10): no suitable image found.  
+Did find: /usr/libexec/apache2/mod_upload_progress.so: mach-o, but wrong architecture 
+</code>
+</pre>
+
+
+Use this command to install under Mac OS X
+
+<pre>
+<code class='bash'>git clone git://github.com/drogus/apache-upload-progress-module.git
+cd apache-upload-progress-module
+sudo apxs -c -Wc,-arch -Wc,x86_64 -Wl,-arch -Wl,x86_64 -i -a mod_upload_progress.c 
+</code>
+</pre>
+
+## 2. Configure Apache/Rails
+
+In the `httpd.conf` located at `/private/etc/apache2/httpd.conf`:
+
+	LoadModule upload_progress_module libexec/apache2/mod_upload_progress.so
+
+In the vhost config:
+
+	<VirtualHost *:80>
+	  ServerName file-upload-progress.local
+	  DocumentRoot "/Users/andrejko/Documents/Projects/web/ri/posts/code/file_upload_progress/public"
+	  RailsEnv development
+	  RailsAllowModRewrite off
+
+	  <directory "/Users/andrejko/Documents/Projects/web/ri/posts/code/file_upload_progress/public">
+	    Order allow,deny
+	    Allow from all
+	  </directory>
+
+	
+		# needed for tracking upload progess
+		<Location />
+		    # enable tracking uploads in /
+		    TrackUploads On
+		</Location>
+
+		<Location /progress>
+		    # enable upload progress reports in /progress
+		    ReportUploads On
+		</Location>
+	</VirtualHost>
+
+### Important
+Make sure to configure the `environment.rb` file so that Paperclip will work under Passenger.
+
+	# location of the Image Magick command files
+	Paperclip.options[:command_path] = "/usr/local/bin"
+
+## 3. Model
+
+The model `image.rb` has the standard Paperclip options
+
+	class Image < ActiveRecord::Base
+	  has_attached_file :photo, 
+	                    :styles => { :medium => "300x300>",
+	                                 :thumb => "100x100#" }
+                    
+	  validates_attachment_presence :photo
+	end
+
+
+## 4. Controller
+
+The controller is a standard restful controller:
+
+	class ImagesController < ApplicationController
+  
+	  def index
+	    @images = Image.find(:all)
+	    # generate a unique id for the upload
+	    @uuid = (0..29).to_a.map {|x| rand(10)}
+	  end
+  
+	  def create
+	    @image = Image.new(params[:image])
+	    respond_to do |wants|
+	      if @image.save
+	        flash[:notice] = 'Image was successfully created.'
+	        wants.html { redirect_to(:action => 'index') }
+	      else
+	        wants.html { redirect_to(:action => 'index') }
+	      end
+	    end
+	  end
+
+	end
+
+
+## 5. View
+
+	<% content_for :scripts do %>
+		<%= javascript_include_tag 'upload' %>
+	<% end %>
+
+	<div class='images'>
+	<%= render :partial => 'image', :collection => @images %>
+	</div>
+
+	<div id='progress' style='display: none;'>
+		File upload in progress
+		<div id='bar' style='width: 0%;'>
+			0%
+		</div>
+	</div>
+
+	<% form_for :image, :url => "/images?X-Progress-ID=#{@uuid}", :html => { :multipart => true } do |form| %>
+		<%= hidden_field_tag 'X-Progress-ID', @uuid %>
+		<%= form.label :photo %>
+	  <%= form.file_field :photo %>
+
+		<%= form.submit 'upload image', :class => 'submit' %>
+	<% end %>
+
+
+## 6. Unobstrusive Javascript
+
+The javsacript is all contained in the `javascsripts/upload.js` file
+
+	// if this is the iframe
+	// reload the parent
+	Event.observe(window, 'load',
+	  function() {
+	    try
+	    {
+	    if (self.parent.frames.length != 0)
+	    self.parent.location=document.location;
+	    }
+	    catch (Exception) {}
+	  }
+	);
+
+	Event.addBehavior({
+	  "input.submit:click" : function () {
+	    $('progress').show();
+    
+	    //add iframe and set form target to this iframe
+	    iframe = document.createElement('iframe');
+	    iframe.name = "progressFrame";
+	    $(iframe).setStyle({width:'0', height: '0', position: 'absolute', top: '3000px'});
+	    document.body.appendChild(iframe);
+    
+	    $(this).up('form').writeAttribute("target", "progressFrame");
+    
+	    $(this).up('form').submit();
+    
+	    //update the progress bar
+	    var uuid = $('X-Progress-ID').value;
+	    new PeriodicalExecuter(
+	      function(){
+	        if(Ajax.activeRequestCount == 0){
+	          new Ajax.Request("/progress",{
+	            method: 'get',
+	            parameters: 'X-Progress-ID=' + uuid,
+	            onSuccess: function(xhr){
+	              var upload = xhr.responseText.evalJSON();
+	              if(upload.state == 'uploading'){
+	                upload.percent = Math.floor((upload.received / upload.size) * 100);
+	                $('bar').setStyle({width: upload.percent + "%"});
+	                $('bar').update(upload.percent + "%");
+	              }
+	            }
+	          })
+	        }
+	      },2);
+  
+	    return false; 
+	  }
+	})
+
+## Optional Enhancements
+
+Here are few additional possible enhancements that were not shown in the screencast.
+
+- Show time to completion of upload.
+- Remove progress bar div from the view and insert dynamically with javascript.
+- Allow multiple simultaneous uploads.
+
+## Credits
+Intro music thanks to [Courtney Williams](http://www.cwill1.com/) via [Podcast NYC](http://www.podcastnyc.net/psm/podcast.html).
