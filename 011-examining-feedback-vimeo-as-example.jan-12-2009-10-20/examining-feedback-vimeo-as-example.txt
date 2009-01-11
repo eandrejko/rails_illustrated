@@ -16,7 +16,7 @@ Feedback is best served warm, very warm.  When a user performs an action the **f
 
 - Feedback should be immediate.
 - Feedback should be appropriate.  Large actions should have large responses and small actions should have small responses.
-- Feedback should be obvious.  If the feedback is visual, it should be clearly apparent to the user.  The feedback should be near the affordance.
+- Feedback should be obvious.  If the feedback is visual, it should be clearly apparent to the user and be as close to the UI element that initiated the action as possible.
 - Feedback should be informative.  Use feedback to set up expectations for the next action.  
 
 ## Use an Idiom
