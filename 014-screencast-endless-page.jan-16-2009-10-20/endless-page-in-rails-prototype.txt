@@ -1,0 +1,176 @@
+# Screencast: An Endless Page in Rails and Prototype
+
+<object width="530" height="400"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=2844220&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=00ADEF&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=2844220&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=00ADEF&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="530" height="400"></embed></object>
+
+There are a lot of cases where pagination is the wrong choice to present a long list of items.  This screencast will show you how to unobtrusively enhance a paginated list of items with an endless page. I first learned of the endless page trick from Aza Raskin of [Humanized](http://www.humanized.com/).  His talk, [Don't Make me Click](http://www.youtube.com/watch?v=EuELwq2ThJE), is well worth watching.
+
+
+## Screen Cast
+- View a quicktime version: [full](/posts/endless-page.mov), [iPod](/posts/endless-page-iPhone.m4v).
+- The [complete code](http://github.com/eandrejko/rails_illustrated_screencasts/tree/a6f88d287037ca3d50756a2d1fcb50ee6bac4913/endless_page) can be downloaded from GitHub.
+
+## Required
+- [will_paginate](http://github.com/mislav/will_paginate/tree/master) or some other plugin to perform pagination
+
+## Optional
+
+- [Firebug](https://addons.mozilla.org/en-US/firefox/addon/1843) for Javascript debugging
+
+## Where to Use an Endless Page
+
+Think about how the user is reading whatever long lists you have in your applications.  **If your user is primarily browsing the list use an endless page instead of pagination**.
+
+Some places that the endless page will work well:
+
+- blog posts/comments
+- photo galleries
+- search results
+
+
+## 1. Setup pagination
+To install the [will_paginate](http://github.com/mislav/will_paginate/tree/master) plugin for pagination use
+<pre>
+<code class='bash'>./script/plugin install git://github.com/mislav/will_paginate.git
+</code>
+</pre>
+
+
+## 2. Model
+
+The model `contact.rb` has a class method to determine the number of contacts per page
+
+	class Contact < ActiveRecord::Base
+  
+	  # number of items per page
+	  def self.per_page
+	    5
+	  end
+  
+	end
+
+## 3. Controller
+
+The controller is a standard restful controller:
+
+	class ContactsController < ApplicationController
+  
+	  def index
+	    respond_to do |wants|
+	      wants.html do
+	        @contacts = Contact.paginate(:page => params[:page], :order => 'last_name asc, first_name asc')        
+	        @page = params[:page] || 1
+	      end
+	      wants.js do
+	        # determine contact that was last
+	        @last = params[:last].to_i
+	        @contacts = Contact.paginate(:page =>  @last + 1, :order => 'last_name asc, first_name asc')        
+	        @page = @last + 1
+        
+	        if @contacts.empty?
+	          @contacts_count = Contact.count
+	          render :partial => 'complete'
+	        else
+	          render :partial => 'contact', :collection => @contacts, :locals => {:page => @page}
+	        end
+	      end
+	    end
+	  end
+  
+	end
+
+
+## 4. View
+
+The `contacts/index.html` is pretty standard:
+
+	<% content_for :scripts do %>
+		<%= javascript_include_tag 'endless' %>
+	<% end %>
+
+	<%= render :partial => 'contact', :collection => @contacts, :locals => {:page => @page} %>
+
+	<div id='loading' style='display: none;'>
+		loading additional contacts
+		<%= image_tag('loading.gif')%>
+	</div>
+
+	<div id='pagination'>
+	<%= will_paginate(@contacts) %>
+	</div>
+	
+A trick we use to store the 'current' page is to use a class on the contact `div`.  In `_contact.html.erb`:
+	<div class='contact page-<%= page %>' id="contact-<%= contact.id %>">
+		...
+	</div>
+
+## 5. Unobstrusive Javascript
+
+The javsacript is all contained in the `javascsripts/endless.js` file
+
+	// from http://codesnippets.joyent.com/posts/show/835
+	Position.GetWindowSize = function(w) {
+		var width, height;
+	        w = w ? w : window;
+	        this.width = w.innerWidth || (w.document.documentElement.clientWidth || w.document.body.clientWidth);
+	        this.height = w.innerHeight || (w.document.documentElement.clientHeight || w.document.body.clientHeight);
+        
+	        return this;
+	}
+
+	function loadRemainingItems(){
+	  // compute amount of page below the current scroll position
+	  var remaining = ($('wrapper').viewportOffset()[1] + $('wrapper').getHeight()) 
+	                      - Position.GetWindowSize().height;
+	  //compute height of bottom element
+	  var last = $$(".contact").last().getHeight();
+  
+	  if(remaining < last*2 && !$('complete')){
+	    if(Ajax.activeRequestCount == 0){
+	      var url = "/contacts";
+	      var last = $$(".contact").last().className.match(/[0-9]+/)[0];
+	      new Ajax.Request(url, {
+	        method: 'get',
+	        parameters: 'last=' + last,
+	        onLoading: function(){
+	          $('loading').show();
+	        },
+	        onSuccess: function(xhr){
+	          $('loading').hide();
+	          $('loading').insert({before : xhr.responseText})
+	        }
+	      });
+	    }
+	  }
+	}
+
+	// hide the pagination links
+	document.observe("dom:loaded", function(){
+	  $('pagination').hide();
+	});
+
+	// find to events that could fire loading items at the bottom
+	Event.observe(window, 'scroll', function(e){
+	  loadRemainingItems();
+	});
+
+	Event.observe(window, 'resize', function(e){
+	  loadRemainingItems();
+	});
+
+
+
+## Optional Enhancements
+
+Here are few additional possible enhancements that were not shown in the screencast.
+
+- Remove contacts from the top of the page as the user scrolls down.
+- Load a variable number of contacts based on the user scrolling behavior.
+- Change the URL to allow bookmarking of specific contents in the list.
+
+## Further Reading
+
+- [Endless Page Railscast](http://railscasts.com/episodes/114)
+- [Endless Page Plugin](http://agilewebdevelopment.com/plugins/endless_page)
+
+## Credits
+Intro music thanks to [Courtney Williams](http://www.cwill1.com/) via [Podcast NYC](http://www.podcastnyc.net/psm/podcast.html).
