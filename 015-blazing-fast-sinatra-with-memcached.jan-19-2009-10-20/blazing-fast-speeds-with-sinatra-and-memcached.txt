@@ -22,12 +22,8 @@ At the top of your Sinatra application should be
 	CONFIG['memcached'] = 'localhost:11211'
 
 	# add caching to Sinatra
-	class Sinatra::EventContext
-	  include CacheableEventContext
-	end
-
-	class Sinatra::Application
-	  include CacheableApplication
+	class Sinatra::Event
+	  include CacheableEvent
 	end
 
 ## Usage
@@ -67,30 +63,19 @@ When you declare a controller method in your application file like
 	end
 
 
-Sinatra stores the block provided and saves it to be executed when responding to a request.  The first step is to override the way Sinatra stores the block.  The `cache.rb` file replaces the standard `get` method definition with
+Sinatra stores the block provided and saves it to be executed when responding to a request.  The caching mechanism replaces this block with another block. This replacement block uses the caching mechanism.  The `cache_key` and original block are saved by means of `Proc.new` which creates a closure and allows the block to access these values at the time of execution.
 
-	def _get_with_caching(path, options={}, &b)
+	def _invoke_with_caching(*args)
 	  if options[:cache_key]
-	    b.instance_variable_set("@cache_key", options[:cache_key])
-	  end
-	  _get_without_caching(path, options, &b)
-	end
-
-In Ruby, blocks are just objects, so we can store the `cache_key` with the block as an instance variable `@cache_key`.  Then when the block is executed it is a simple matter of accessing this instance variable to check the cache.
-
-### Overriding the block execution
-
-When Sinatra responses to a request, it creates an object of class `EventContext`, stores the parameters of the request and then executes the stored block using `instance_eval`.  This block execution is modified by `cache.rb` to check for the instance variable `@cache_key` set above and response accordingly.
-
-	def _instance_eval_with_caching(*args, &block)
-	  if block && block.instance_variable_get("@cache_key")
-	    key = block.instance_variable_get("@cache_key") + "/" + params.to_a.join("-")
-	    Sinatra::Cache.cache(key) do 
-	      _instance_eval_without_caching(*args, &block)
+	    # replace the block with another block that can be cached
+	    def wrap_block(key,block)
+	      Proc.new do
+	        Sinatra::Cache.cache(key + "/" + params.to_a.join("/")) { instance_eval(block) }
+	      end
 	    end
-	  else
-	    _instance_eval_without_caching(*args, &block)
+	    @block = wrap_block(options[:cache_key], block)
 	  end
+	  _invoke_without_caching(*args)
 	end
 
 ## How fast is it?
