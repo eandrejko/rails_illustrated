@@ -1,0 +1,86 @@
+# Blazing Fast Speeds with Sinatra and Memcached
+
+[Sinatra](http://sinatra.rubyforge.org/) is a wonderful small Ruby web framework built on top of the [Rack interface](http://rack.rubyforge.org/).  Sinatra is very fast out of the box making it perfect for light weight tasks.  Sinatra does not come with support for memcached out of the box but adding support for memcached is fairly straightforward.  
+
+## Requirements
+1. Download the file [`cache.rb`](/posts/cache.rb).
+
+1. You will need to have installed memcached and also the `memcache-client` gem:
+
+<pre>
+<code class='bash'>sudo gem install memcache-client
+</code>	
+</pre>
+
+## Installation
+
+At the top of your Sinatra application should be 
+
+	require 'sinatra'    
+	require 'cache'    
+	
+	CONFIG['memcached'] = 'localhost:11211'
+
+	# add caching to Sinatra
+	class Sinatra::Event
+	  include CacheableEvent
+	end
+
+## Usage
+
+A standard Sinatra controller method looks like this:
+
+	get '/:name' do
+		...
+		erb 'name'
+	end
+	
+To add caching change to:
+
+	get '/:name', :cache_key => Name.cache_key do
+		...
+		erb 'name'
+	end
+
+You will want `Name.cache_key` to return a string and to change whenever the content returned by `name.html.erb` view will change.  You do not have to invalidate any caches directly.  Furthermore the computed `cache_key` will automatically include details of the parameters of the request.
+
+If you want to cache anything else inside your application use:
+
+	result = Sinatra::Cache.cache(cache_key) do
+		this_is_an_expensive_method
+	end
+
+## How it Works
+
+There are essentially two modification that must be made. Override the way Sinatra stores blocks that make up the controller methods and also to override the way Sinatra calls those stored blocks.
+
+### Overriding the block storage
+When you declare a controller method in your application file like
+
+	get '/:name' do
+		...
+		erb 'name'
+	end
+
+
+Sinatra stores the block provided and saves it to be executed when responding to a request.  The caching mechanism replaces this block with another block. This replacement block uses the caching mechanism.  The `cache_key` and original block are saved by means of `Proc.new` which creates a closure and allows the block to access these values at the time of execution.
+
+	def _invoke_with_caching(*args)
+	  if options[:cache_key]
+	    # replace the block with another block that can be cached
+	    def wrap_block(key,block)
+	      Proc.new do
+	        Sinatra::Cache.cache(key + "/" + params.to_a.join("/")) { instance_eval(&block) }
+	      end
+	    end
+	    @block = wrap_block(options[:cache_key], block)
+	  end
+	  _invoke_without_caching(*args)
+	end
+
+## How fast is it?
+
+This depends on how long it takes do generate your `cache_key`.  There is also additional overhead in accessing memcached.  In my case it usually takes about 15 milliseconds to respond from the cache.  
+
+### It doesn't matter
+However it doesn't matter that much.  You web application speed usually doesn't depend on how fast your application responds, especially when the response time is less than 150 milliseconds.  To understand why see [this explanation of where your application is really slow](/Improving-Rails-Application-Speed.html).
