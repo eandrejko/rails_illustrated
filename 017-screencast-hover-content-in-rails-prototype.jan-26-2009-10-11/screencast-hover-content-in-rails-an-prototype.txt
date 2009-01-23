@@ -1,0 +1,117 @@
+# Screencast: Hover Content in Rails and Prototype  (Part 1)
+
+<object width="530" height="400"><param name="allowfullscreen" value="true" /><param name="allowscriptaccess" value="always" /><param name="movie" value="http://vimeo.com/moogaloop.swf?clip_id=2926137&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=00ADEF&amp;fullscreen=1" /><embed src="http://vimeo.com/moogaloop.swf?clip_id=2926137&amp;server=vimeo.com&amp;show_title=1&amp;show_byline=1&amp;show_portrait=0&amp;color=00ADEF&amp;fullscreen=1" type="application/x-shockwave-flash" allowfullscreen="true" allowscriptaccess="always" width="530" height="400"></embed></object><br /><a href="http://vimeo.com/">Screencast: Hover Content in Rails and Prototype</a> from <a href="http://vimeo.com/user1001525">Erik Andrejko</a> on <a href="http://vimeo.com">Vimeo</a>.
+
+It is often a good idea to show content when the user hovers the mouse above a link or an element in a page.  This technique has been [abused by some](http://www.guardian.co.uk/technology/2007/feb/22/web20.internet), but when used correctly it can enhance the user's experience.  This is particularly the case when you have a lot of information that may be relevant to the user's interests but is too much to display all at once.
+
+## Screencast
+- View a quicktime version: [full](/posts/screencast-hover-content.mov), [iPod](/posts/screencast-hover-content-iPhone.m4v).
+- The [complete code](http://github.com/eandrejko/rails_illustrated_screencasts/) can be downloaded from GitHub.
+
+## Required
+- [LowPro](http://www.danwebb.net/2006/9/3/low-pro-unobtrusive-scripting-for-prototype) for unobtrusive javascript for Prototype
+
+## Optional
+
+- [Firebug](https://addons.mozilla.org/en-US/firefox/addon/1843) for Javascript debugging
+
+## Basic Strategy 
+![Hover Content Wrapper Div](/posts/hover-content-wrapper-div.jpg)
+
+We want to place the content that appears when the mouse is hovered as near as possible to the element that generates the hover (the affordance).  We accomplish this by means of a wrapper `div` around each row of contacts.
+
+## 1. Controller
+
+In the controller the contacts are grouped into groups of 4 so that they can be wrapped in a `div`.
+
+	def index
+	  @contacts = Contact.find(:all, :order => 'last_name asc, first_name asc')
+	  @contact_groups = @contacts.in_groups_of(4,false)
+	end
+
+	def show
+	  @contact = Contact.find(params[:id])
+	end
+
+
+
+## 2. View
+
+The trick is to wrap each each row of contacts with the wrapper `div`.  This accomplished by the `contact_group` partial.
+
+	<% content_for :scripts do %>
+	<%= javascript_include_tag 'hover_content' %>
+	<% end %>
+
+
+	<div id='contact-names'>
+	<%= render :partial => 'contact_group', :collection => @contact_groups %>
+	</div>
+
+The `contact_group` partial wraps the row in a `div`.
+
+	<div class='contact-group'>
+		<%= render :partial => 'contact_name', :collection => contact_group %>
+	</div>
+
+
+## 3. Unobtrusive Javascript
+
+The javascript is fairly straightforward.  When the `mouseover` event is received, we load the content to display with an Ajax call.
+
+
+### Bubbling Event Problem
+
+The `div` that we watch for `mouseover` events has child elements.  When any of those elements received a `mouseover` event it will be sent to the parent elements.  This means that the `div` will receive extraneous events.  We must ignore these extra events to provide smooth visual effects. 
+
+The check for bubbling `mouseover` events from child elements with Protoype:
+
+	// from http://groups.google.com/group/prototype-scriptaculous/browse_thread/thread/badf3974a0dd5ac6
+	function bubbledFromChild(element, event)  {
+	  var target = $(event).element();
+	  if (target === element) target = event.relatedTarget;
+	  return (target && target.descendantOf(element));
+	}
+
+This check is used on each function that handles either the `mouseover` or `mouseout` events.  The rest of the Javascript is fairly routine:
+
+	Event.addBehavior({
+	  ".contact-name:mouseover" : function(e){
+	    if(!bubbledFromChild(this,e)){
+	      $(this).setStyle({backgroundColor:"#f0f0f0"});
+	      var id = $(this).readAttribute("id").match(/[0-9]+$/)[0];
+	      var container = $(this).up(".contact-group");
+	      $$(".contact").each( function(e) {
+	        e.hide();
+	      });
+	      if($(container).down("#contact-"+id)){
+	        new Effect.Appear("contact-"+id, {queue: 'end', duration: 0.7})
+	      }else{
+	        if(Ajax.activeRequestCount == 0){
+	          var url = $(this).down("a").readAttribute("href");
+	          new Ajax.Request(url,{
+	            method: 'get',
+	            onSuccess: function(xhr){
+	              container.insert({bottom: xhr.responseText});
+	            }});
+	        }
+	      }      
+	    }
+	  },
+  
+	  ".contact-name:mouseout" : function(e){
+	    if(!bubbledFromChild(this,e)){
+	      $$(".contact").each( function(e) {
+	        e.hide();
+	      });      
+	    }
+	  }
+	})
+
+
+## Optional Enhancements
+
+Over the next couple of weeks we shall continue this screencast by enhancing this hover technique to improve usability.
+
+## Credits
+Intro music thanks to [Courtney Williams](http://www.cwill1.com/) via [Podcast NYC](http://www.podcastnyc.net/psm/podcast.html).
