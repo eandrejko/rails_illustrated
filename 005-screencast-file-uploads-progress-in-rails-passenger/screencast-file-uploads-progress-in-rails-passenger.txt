@@ -149,7 +149,7 @@ The controller is a standard restful controller:
 
 ## 6. Unobstrusive Javascript
 
-The javsacript is all contained in the `javascsripts/upload.js` file
+The javascript is all contained in the `javascsripts/upload.js` file
 
 	// if this is the iframe
 	// reload the parent
