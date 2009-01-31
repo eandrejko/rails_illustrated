@@ -1,0 +1,42 @@
+# A Simple Class Based Logger in Rails
+
+In a project I was working on there were several classes that were involved in a lot of background processing. In order to monitor the behavior of this background processing I wanted a separate log file for these classes.  The result: `class_logger` is a simple plugin that creates a separated log file for an `ActiveRecord` model.
+
+## Installation 
+
+	./script/plugin install git://github.com/eandrejko/class_logger.git
+	
+## Usage
+
+In your model use 
+
+	class Email < ActiveRecord::Base
+		has_own_logger
+	end
+
+which will by default create a log file `log/email.log`.  To write to this log file use:
+
+	email = Email.create
+	email.log("sending")
+
+or use the class method:
+
+	Email.class_logger("connecting to server")
+
+## Specifying the directory
+
+If you want to keep the log file in another location specify the directory with:
+
+	class Email < ActiveRecord::Base
+		has_own_logger :in => 'log/emails'
+	end
+
+which will create the log file in `log/emails/email.log`.
+
+## Potential Applications
+
+There are some advantages to having a separate log file.  You can log many more events without cluttering up your `production.log`.  This is potentially helpful for
+
+- troubleshooting background processing in production
+- recording and analyzing performance of long running processes in your application
+
