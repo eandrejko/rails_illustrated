@@ -1,0 +1,82 @@
+# More Rails Speed with asset_packager Plugin
+
+One of the [many strategies for speeding up your Rails application](/Improving-Rails-Application-Speed.html) is to **serve exactly one CSS file** and **exactly one Javascript file**.  It is often more convenient to have multiple files in development and only package these files into one file in production.  It doesn't hurt to also minify these files when in production mode.  This is exactly what Scott Becker's great `asset_packager` [original plugin](http://synthesis.sbecker.net/pages/asset_packager) is for.
+
+## Asset Packager Plugin with YUI Compressor
+
+The standard `asset_packager` is a great plugin.  It has a couple of issues:
+
+- It has a bug: it mangles CSS with multiline comments.
+- It uses a sub optimal Javascript and CSS compressor.
+
+### YUI Compressor
+
+The [Yahoo YUI Compressor](http://developer.yahoo.com/yui/compressor/) is "100% safe" and does a great of job of reducing both Javascript and CSS file size.
+
+> The goal of JavaScript and CSS minification is always to preserve the operational qualities of the code while reducing its overall byte footprint (both in raw terms and after gzipping, as most JavaScript and CSS served from production web servers is gzipped as part of the HTTP protocol). The YUI Compressor is JavaScript minifier designed to be 100% safe and yield a higher compression ratio than most other tools. Tests on the YUI Library have shown savings of over 20% compared to JSMin (becoming 10% after HTTP compression).
+
+I have modified the `asset_packager` plugin to use the YUI compressor, if available, for both CSS and Javascript minification.
+
+### Compression
+
+The YUI compressor provides some serious savings:
+
+- `prototype.js` uncompressed: 54K
+- `prototype.js` compressed with `jsmin.rb` Ruby compressor: 41K
+- `prototype.js` compressed with YUI compressor: 33K
+
+## Requirements
+
+- A java run time environment should be installed on the server.  If it is not available the asset_packager will still function but won't use the YUI compressor.
+
+## Installation
+
+Until the official version includes the changes to support the YUI compressor you will have to use my fork.  
+
+Install with
+
+	./script/plugin install git://github.com/eandrejko/asset_packager.git
+	
+Generate the `config/asset_packages.yml` configuration file with 
+
+	rake asset:packager:create_yml
+
+Modify the configuration file to include the necessary Javascript and CSS files:
+
+	--- 
+	javascripts: 
+	- base: 
+	  - prototype
+	  - effects
+	  - dragdrop
+	  - controls
+	  - application
+	stylesheets: 
+	- base: 
+	  - reset
+	  - text
+	  - screen
+
+In your layout file use:
+
+	<%= javascript_include_merged :base %>
+	<%= stylesheet_link_merged :base %>
+
+When your application is in the production environment all of the files will be automatically merged and compressed.
+
+## Check Javascript Files
+
+To check your Javascript files for issues that might inhibit compression use the rake task
+
+	rake asset:packager:check
+
+
+## Use the Google version
+
+Most browsers make at most two simultaneous connections to each web server.  If you place the following in your application layout file:
+
+	<script src="http://ajax.googleapis.com/ajax/libs/prototype/1.6.0.3/prototype.js" type="text/javascript" charset="utf-8"></script>
+	<%= javascript_include_merged :base %>
+	<%= stylesheet_link_merged :base %>
+
+The `prototype.js` file will be loaded from Google and it may be loaded in parallel with your compressed Javascript files.  With any luck the user will already have it cached.  You will want to remove the `prototype` from the  `config/asset_packages.yml` file.
