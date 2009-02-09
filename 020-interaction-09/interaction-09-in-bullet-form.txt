@@ -1,0 +1,14 @@
+# Interaction '09 Conference in Bullet Form
+
+[Luke Wroblewski](http://www.lukew.com/), the writer of the book [Web Form Design: Filling in the Blanks](http://www.lukew.com/resources/web_form_design.asp), has a synopsis of some of the talks at this years [Interaction Conference](http://interaction09.ixda.org/). The talks include:
+
+- [How to Change Complicated Stuff](http://www.lukew.com/ff/entry.asp?772)
+- [Designing the Viral App](http://www.lukew.com/ff/entry.asp?774)
+- [Mobile UX Patterns](http://www.lukew.com/ff/entry.asp?773)
+- [Carpe Diem](http://www.lukew.com/ff/entry.asp?771) (growing the profession of interaction design)
+- [Designing Natural Interfaces](http://www.lukew.com/ff/entry.asp?770)
+- [Irrational Behavior](http://www.lukew.com/ff/entry.asp?769)
+- [Fiona Raby](http://www.lukew.com/ff/entry.asp?768) (interaction between people and things)
+- [Coming Into Your Own](http://www.lukew.com/ff/entry.asp?767) (growing the discipline of interaction design)
+- [Experiencing Sustainability](http://www.lukew.com/ff/entry.asp?766)
+
