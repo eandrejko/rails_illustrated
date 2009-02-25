@@ -1,0 +1,69 @@
+# A Simple Improvement to Twitter
+
+![Twitter 0](/posts/twitter-0.jpg)
+
+I'm sure that many have seen the Twitter user page.  I would guess most common use                         of this page is to:
+
+- **decide if to follow** a user, and then
+- **to follow** that user
+
+If that is the case, why isn't the page optimized for these tasks?  
+
+## What works well
+
+In order to meet the first need: "decide if to follow a user" I think the page works well.
+
+  
+The following are probably of most interest in deciding if to follow a user:
+
+- number of followers
+- number following
+- bio
+- recent tweets
+
+All of these items are shown in a prominent place in the page.  It is easy for a user to scan and find all of these items in a matter of a couple of seconds.
+
+## What can be improved
+Now that you have decided to follow a user.  The next action to take is to click the 'Follow' button.
+![Twitter 1](/posts/twitter-1.jpg)
+Think back to the first time you clicked on the 'Follow' button.  Was the click successful?  How did you know? 
+
+There are two problems with the interaction design of the 'Follow' button: 
+
+- the 'Follow' button does not change state
+- the spinner is **700 pixels away** from the button
+
+
+## A simple improvement
+
+By changing a few lines of HTML and Javascript the design could be changed to:
+![Twitter 1](/posts/twitter-2.jpg)
+
+In the redesign, after clicking 'Follow' the reaction is entirely in the visual field of the user and linked by proximity to the 'Follow' button.
+
+In this case:
+- the 'Follow' button changes state and indicates this change visually
+- the spinner is right next to the button
+
+**Note**: It may be the case that the spinner is used for multiple actions on the same page.  If this is the case, place a spinner appropriately near each interface element that initiates an action.
+
+## Reasonable, but can be improved
+
+This use of proximity is already used by Twitter to indicate that the follow action has been successful.  
+
+![Twitter Following](/posts/twitter-following.jpg)
+
+I think the placement of the success message is appropriate, as is the change in state of the 'Follow' button.  
+
+
+Now suppose that the user wants to stop following someone.  They will click the 'Following' button and see:
+![Twitter Unfollow](/posts/twitter-unfollow.jpg)
+
+There are a few issues:
+
+- to unfollow requires two clicks
+- the unfollow process is not symmetric with the follow process
+- the language is not consistent: click 'Follow' to follow, click the 'Following' to stop following
+- unfollow is called 'remove'
+
+I suspect the design is like this to prevent a user from spuriously unfollowing someone.  In cases like these it is almost always better to **replace confirmation actions with an undo**, i.e. [Never Use a Waring When you Mean Undo](http://www.alistapart.com/articles/neveruseawarning/).    
