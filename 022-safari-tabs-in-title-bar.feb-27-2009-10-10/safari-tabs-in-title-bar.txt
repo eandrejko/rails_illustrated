@@ -1,0 +1,34 @@
+# Safari version 4 and tabs in the title bar
+
+![Safari 4](/posts/safari-4.jpg)
+
+If you haven't already seen the beta version of Safari 4 you might be in for a little surprise when upgrading from Safari 3.  The tabs have moved into the title bar of the window, just like Google Chrome.
+
+I haven't decided if this is a good idea or not yet.  What I find the most interesting is that this has generated a lot of spirited discussion.  The most important conclusion from this whole ordeal is probably that sometimes making user experience decisions is very hard.  Fortunately, most user experience decisions are pretty easy.
+
+## Arguments in favor of tabs in the title bar
+There are a couple of arguments that placing tabs in the title bar more closely matches the metaphor that a modern web browser uses.
+
+- [Google Chrome's Explanation](http://www.google.com/googlebooks/chrome/small_18.html)
+- [Matching Users' Mental Models](http://ignorethecode.net/blog/2009/02/24/hierarchies/)
+- [Defending Safari 4 tabs](http://manton.org/2009/02/defending.html) with several good criticisms
+
+## Arguments against tabs in the title bar
+
+There are those that find good reason not to put tabs in the title bar:
+
+- [Tabs in the title bar: a UI design trend that needs to go](http://www.tuaw.com/2009/02/26/tabs-in-the-title-bar-a-ui-design-trend-that-needs-to-go/)
+- [Vagabond Tabs](http://onebuttonmouse.com/ramblings/vagabond-tabs/)
+
+## Changing the tabs back
+
+To change back the tab behavior to be like Safari 3 use:
+
+	$ defaults write com.apple.Safari DebugSafari4TabBarIsOnTop -bool NO
+
+More [configuration options](http://swedishcampground.com/safari-4-hidden-preferences) are also available.
+
+## Reloading is now harder
+
+One complaint that I do have is that clicking the reload button is now much harder.  In Safari 4 the reload button is **only 30%** of the size of the Safari 3 button.  This makes it much more difficult and [much slower to click](http://en.wikipedia.org/wiki/Fitts's_law).  
+
