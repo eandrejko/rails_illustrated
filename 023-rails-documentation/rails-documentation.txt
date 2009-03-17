@@ -1,0 +1,5 @@
+# Browsing the Rails Documentation online
+
+![Railsdocs](/posts/railsdocs.jpg)
+
+There is a great new searchable version of the Rails documentation online at [http://voloko.ru/sdoc/rails/rdoc/](http://voloko.ru/sdoc/rails/rdoc/).  This version is very fast and can [even be downloaded](http://voloko.ru/sdoc/rails/) for offline (airplane?) use.  What a nice usable search interface with embedded browsing capabilit.  I have used [http://www.railsbrain.com/](http://www.railsbrain.com/) but I find the search experience to be suboptimal.  (Thanks to [Rails Inside](http://www.railsinside.com/documentation/258-good-looking-searchable-rails-api-docs.html) for the link.)
