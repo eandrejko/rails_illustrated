@@ -1,0 +1,14 @@
+# Is the Diggbar Impacting Your User's Experience?
+
+![Diggbar](/posts/diggbar.jpg)
+
+The recently launched Diggbar from [digg.com](http://digg.com) can wrap your site in a frame if the user visits a special URL on digg.com.  Your user's experience is negatively impacted:
+
+- the URL in the address bar is 'digg.com'
+- your site title could be changed
+- content is moved down the page (leaving less 'above the fold')
+- it adds visual noise to your site
+- it changes your finely crafted visual design
+- your site's personality is affected
+
+Many sites (like the [NY Times](http://nytimes.com)) are, with good reason, [blocking this Diggbar](http://daringfireball.net/2009/04/how_to_block_the_diggbar).  There is a Rails plugin to do this for your site: [acts_against_douchebar](http://github.com/sandofsky/acts_against_douchebar/tree/master).
