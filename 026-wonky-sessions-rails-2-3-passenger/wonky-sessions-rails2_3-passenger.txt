@@ -1,0 +1,14 @@
+# Weird Session Issues in Rails 2.3 and Passenger
+
+Are you having weird issues associated with sessions using Rails 2.3 and Passenger?  Perhaps you have problems like repeated `flash` messages and the inability to logout by destroying a session variable.  
+
+There is a simple fix: **upgrade passenger**.  This [lighthouse ticket has some more details about session problems](http://rails_security.lighthouseapp.com/projects/15332/tickets/40-rails-edge-and-passenger).
+
+To update passenger:
+
+	sudo gem install passenger
+	passenger-install-apache2-module
+	
+After installing the new Passenger Apache module you will probably have to edit the `httpd.conf` to include the new version of the Passenger module.  
+
+After restarting Apache everything was working correctly.
