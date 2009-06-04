@@ -1,0 +1,68 @@
+# Getting Started with Tokyo Cabinet
+
+![421422 21102890](/posts/421422_21102890.jpg)
+
+[Tokyo Cabinet](http://tokyocabinet.sourceforge.net/) is an [extremely fast](http://gist.github.com/54371) key-value store.  It's a lot like memcache: **only better**.
+
+## Advantages over Memcache
+
+- Tokyo Cabinet can be run as a server (called [Tokyo Tyrant](http://tokyocabinet.sourceforge.net/tyrantdoc/)) but it can also be used without running as a server.
+- Tokyo Cabinet understands the memcache protocol, but also has its own protocol that has a smaller network footprint.
+- Tokyo Cabinet is [more flexible](http://tokyocabinet.sourceforge.net/rubydoc/) supporting different types of stores.
+- Tokyo Cabinet stores can be easily persisted to disk.
+
+## Installation
+
+First, you must install the Tokyo Cabinet libraries:
+
+	wget http://tokyocabinet.sourceforge.net/tokyocabinet-1.4.23.tar.gz
+	tar xvzf tokyocabinet-1.4.23.tar.gz
+	cd tokyocabinet-1.4.23
+	./configure
+	make
+	sudo make install
+
+### Ruby bindings installation
+
+Next install the Ruby interface.  Unfortunately, Tokyo Cabinet is not currently bundled as a gem.  To install:
+
+	wget http://tokyocabinet.sourceforge.net/rubypkg/tokyocabinet-ruby-1.25.tar.gz
+	tar xvzf tokyocabinet-ruby-1.25.tar.gz
+	cd tokyocabinet-ruby-1.25/
+	ruby extconf.rb
+	make
+
+### Installation on Mac OS X Leopard	
+	
+If, on Mac OS X Leopard, you get an error like this:
+	
+	ld: warning in /usr/local/lib/libtokyocabinet.dylib, file is not of required architecture
+
+Then replace the instructions above with:
+
+	wget http://tokyocabinet.sourceforge.net/rubypkg/tokyocabinet-ruby-1.25.tar.gz
+	tar xvzf tokyocabinet-ruby-1.25.tar.gz
+	cd tokyocabinet-ruby-1.25/
+	ARCHFLAGS="-arch i386" ruby extconf.rb
+	make clean
+	make
+	sudo make install
+
+Now you should have the Ruby interface to the Tokyo Cabinet.
+
+## Using Tokyo Cabinet
+
+To use Tokyo Cabinet within Ruby it is as simple as:
+
+	require 'tokyocabinet'
+	include TokyoCabinet
+	
+	hdb = HDB::new
+	hdb.open("has-db.tch", HDB::OWRITER | HDB::OCREAT)
+	hdb.put("this-is-a-key","this-is-a-value")
+	puts hdb.get("this-is-a-key")
+
+## Further Reading
+
+- The [RDocs for Tokyo Cabinet](http://tokyocabinet.sourceforge.net/rubydoc/)
+- [Tokyo Cabinet: Beyond Key-Value Store - igvita.com](http://www.igvita.com/2009/02/13/tokyo-cabinet-beyond-key-value-store/)
