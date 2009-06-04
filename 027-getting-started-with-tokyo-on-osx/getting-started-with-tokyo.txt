@@ -65,4 +65,5 @@ To use Tokyo Cabinet within Ruby it is as simple as:
 ## Further Reading
 
 - The [RDocs for Tokyo Cabinet](http://tokyocabinet.sourceforge.net/rubydoc/)
+- [Tokyo Cabinet: a modern implementation of DBM](http://tokyocabinet.sourceforge.net/)
 - [Tokyo Cabinet: Beyond Key-Value Store - igvita.com](http://www.igvita.com/2009/02/13/tokyo-cabinet-beyond-key-value-store/)
