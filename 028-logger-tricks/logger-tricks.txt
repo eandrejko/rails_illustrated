@@ -16,4 +16,4 @@ To log to STDOUT while using the console use [this trick](http://rubyquicktips.t
 	  config.logger = Logger.new(Rails.root.join("log",Rails.env + ".log"),3,5*1024*1024)  
 	end
 
-For More tips on Rails logging see this post: [Rails Logging Tips](http://maintainable.com/articles/rails_logging_tips).
+For more tips on Rails logging see this post: [Rails Logging Tips](http://maintainable.com/articles/rails_logging_tips).
