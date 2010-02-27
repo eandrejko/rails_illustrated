@@ -6,7 +6,7 @@ Save disk space by rotating logs in the `config/environments/test.rb` and `confi
 
 	config.logger = Logger.new(Rails.root.join("log",Rails.env + ".log"),3,5*1024*1024)
 
-which will rotate the log files every 5 megabytes.
+which will rotate the log files every 5 megabytes and leave only the three most recent log files.  This will limit the total spaces used by the logs at 15 megabytes.
 
 To log to STDOUT while using the console use [this trick](http://rubyquicktips.tumblr.com/post/379756937/always-turn-on-activerecord-logging-in-the-console):
 
