@@ -1,0 +1,47 @@
+# These Aren't the Deprecation Warnings You Are Looking For
+
+Ruby prints some helpful deprecation warnings when using some deprecated features of the Ruby language.  However, you won't find these errors when they occur within a rake task run inside Rails.
+
+## Warnings Often Indicate Bugs
+
+I prefer to [treat warnings as errors](http://media.pragprog.com/titles/pad/CodeAndDebug.pdf), as warnings often indicate the presence of a bug.  For example, in Ruby 1.8.7, the `id` method is deprecated and calling `id` on an `Object` that doesn't define an `id` method prints an error:
+
+	warning: Object#id will be deprecated; use Object#object_id
+
+A warning like that is probably a good sign I am calling `id` on the wrong `Object`.  These deprecation warnings are, *surprisingly*, explicitly turned off in Rails rake tasks in both Rails 2.3 and Rails 3.
+
+## Missing Warnings
+
+A Rake task like the following will output nothing when run from `lib/tasks`:
+
+	namespace :deprec do
+	  task :test do
+	    nil.type # => no deprecation warning
+	    nil.id # => no deprecation warning
+
+	    A = Class.new
+	    a = A.new 
+	    a.id # =>  no deprecation warning
+	    a.type # =>  no deprecation warning
+	  end
+	end
+
+To add back the warnings, simply put `$VERBOSE = true` at the top of the rake task:
+
+	$VERBOSE = true
+	namespace :deprec do
+	  task :test do
+	    nil.type # => deprecation warning
+	    nil.id # => deprecation warning
+
+	    A = Class.new
+	    a = A.new 
+	    a.id # => deprecation warning
+	    a.type # => deprecation warning
+	  end
+	end
+
+	
+## A Long History
+
+I'm not sure why silencing warnings is the default behavior for Rails rake tasks.  The `$VERBOSE = nil` [seems to originate](http://github.com/rails/rails/blob/db045dbbf60b53dbe013ef25554fd013baf88134/railties/fresh_rakefile) in the [very first commit](http://github.com/rails/rails/commit/db045dbbf60b53dbe013ef25554fd013baf88134).
