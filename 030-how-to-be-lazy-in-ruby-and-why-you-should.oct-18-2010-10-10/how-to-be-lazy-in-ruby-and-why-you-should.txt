@@ -1,0 +1,95 @@
+# How to be Lazy in Ruby and Why You Should Be
+
+Ruby borrows many ideas from functional languages, allowing for readable, terse methods without side affects.  There are sometimes significant drawbacks to writing functional Ruby code, including inadvertent memory consumption.  Fortunately these drawbacks can be avoided by making use of Ruby's `Enumerator` objects to implement lazy sequences.
+
+When writing ruby scripts for data munging, a common problem is to read a character separated data file into a Ruby hash.  If we have a data file with two columns, say `user_id` and `group_id` and we wish to read that into memory as hash with `user_id` as the key and `group_id` as the value we could use something like the following:
+
+    result = File.open("data") do |f|
+      f.readlines.map{|l| l.strip.split(/,/)}.inject({}){|h,l| h.merge(l.first.to_i => l.last.to_i)}
+    end
+
+This implementation is functional but has one major drawback: `readlines` will return an instance of `Array` and so the entire file will be read into memory before constructing the hash.  If the file is of appreciable size this will quickly become a serious performance bottleneck.  One way to rectify this problem is to change the implementation to the following:
+
+    result = File.open("data") do |f|
+      h = {}
+      f.each do |l|
+        l = l.strip.split(/,/)
+        h[l.first.to_i] = l.last.to_i
+      end
+      h
+    end
+
+While this no longer reads the entire data file in memory, addressing the memory concerns of the original implementation, it is certainly more verbose than the original implementation.  In particular, many might argue that the first implementation is the idiomatic Ruby implementation, and that the second implementation should be avoided unless there are known to be memory related performance problems.
+
+## The Lazy Way
+
+There is a way to have the best of both worlds: a function style implementation that avoids loading the entire input file into memory at once by making use of Ruby's `Enumerator` class.  An `Enumerator` objects encapsulates the traversal of an enumerable, _without performing the complete traversal_.  Thus, by using an `Enumerator` we can express the loading of the file in a functional way, without loading the file all at once into an `Array` at the very first step.
+
+It is easy to construct an `Enumerator` for many of the methods defined in the `Enumerable` module using the `enum_for` method:
+
+    [:a, :b, :c].enum_for(:reject) # => #<Enumerable::Enumerator:0x1011f5d40>
+
+In fact, the `File.each` method will return an instance of `Enumerator` if no block is provided:
+
+    File.open("data") {|f| f.each} # => #<Enumerable::Enumerator:0x1011ca640>
+
+Knowing this we can re-write our original implementation:
+
+    result = File.open("data") do |f|
+      f.each.map{|l| l.strip.split(/,/)}.inject({}){|h,l| h.merge(l.first.to_i => l.last.to_i)}
+    end
+
+Now `f.each` will return an `Enumerator`.  Assuming that `map` will also return an `Enumerator` we will have succeeded in constructing a lazy sequence from the input file.  
+
+Unfortunately `map` does not return an instance of `Enumerator`, instead returning an instance of `Array`.  This is considered a [bug](http://redmine.ruby-lang.org/issues/show/708) in Ruby 1.9 (and in Ruby 1.8.7) and should hopefully fixed sometime soon.  As a work around we can monkey patch `Enumerable` to fix the `map` method:
+
+    module Enumerable
+      class Enumerator
+       
+        def map(&block)
+          self.class.new do |yielder|
+            each do |e|
+              yielder << block.call(e)
+            end
+          end
+        end
+      
+     end
+    end
+
+Now `map` will return a new `Enumerator`, which will yield an enumeration of the result of calling the block provided to `map` on the original sequence provided by the original `Enumerator` instance.  Many other methods in the `Enumerable` module can also be modified to return an instance of `Enumerator`.  For implementation details see [lazy_enum.rb](http://redmine.ruby-lang.org/attachments/download/121) as attached to the original [bug](http://redmine.ruby-lang.org/issues/show/708) report.
+
+This code is Ruby 1.9 specific as `Enumerator.new` doesn't take a block in Ruby 1.8.7.  We can use the [Ruby facets gem](http://github.com/rubyworks/facets) to make `Enumerator` in Ruby 1.8.7 behave like `Enumerator` in Ruby 1.9.
+
+## Putting it all together
+
+We can now write a completely lazy functional implementation of our original problem which works in Ruby 1.8.7:
+
+    require 'facets/enumerator'
+    
+    module Enumerable
+      class Enumerator
+       
+        def map(&block)
+          self.class.new do |yielder|
+            each do |e|
+              yielder << block.call(e)
+            end
+          end
+        end
+      
+     end
+    end
+
+    result = File.open("data") do |f|
+      f.each.map{|l| l.strip.split(/,/)}.inject({}){|h,l| h.merge(l.first.to_i => l.last.to_i)}
+    end
+
+## Further reading        
+- [http://github.com/rdp/ruby_tutorials_core/wiki/enumerator](http://github.com/rdp/ruby_tutorials_core/wiki/enumerator)
+- [http://blog.grayproductions.net/articles/infinite_streams](http://blog.grayproductions.net/articles/infinite_streams)
+- [http://moonbase.rydia.net/software/lazy.rb/](http://moonbase.rydia.net/software/lazy.rb/)
+- [http://ruby-doc.org/stdlib/libdoc/enumerator/rdoc/index.html](http://ruby-doc.org/stdlib/libdoc/enumerator/rdoc/index.html)
+- [http://www.michaelharrison.ws/weblog/?p=163](http://www.michaelharrison.ws/weblog/?p=163)
+- [http://flori.github.com/lazylist/](http://flori.github.com/lazylist/)
+
